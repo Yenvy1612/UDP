@@ -12,7 +12,7 @@ import java.net.DatagramSocket;
 
  */
 public class UDPDataTypeQ1 {
-    private static final int PORT = 807;
+    private static final int PORT = 2207;
     private static final String Q_CODE = "THAY_QCODE_CAU_1";
 
     public static void main(String[] args) throws Exception {

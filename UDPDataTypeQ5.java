@@ -6,7 +6,7 @@ import java.net.DatagramSocket;
  * requestId;max,min. Mã sinh viên: B23DCCN952.
  */
 public class UDPDataTypeQ5 {
-    private static final int PORT = 807;
+    private static final int PORT = 2207;
     private static final String Q_CODE = "erb8WGbH";
 
     public static void main(String[] args) throws Exception {

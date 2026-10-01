@@ -1,5 +1,7 @@
-import java.util.HashSet;
-import java.util.Set;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 
 /**
  * ĐỀ UDP Character - Câu 3:
@@ -8,20 +10,91 @@ import java.util.Set;
  * B23DCCN952.
  */
 public class UDPCharacterQ3 {
-    private static final int PORT = 808;
-    private static final String Q_CODE = "THAY_QCODE_CAU_3";
+    public static void main(String[] args) {
 
-    public static void main(String[] args) throws Exception {
-        try (var socket = UDPClientSupport.openSocket()) {
-            var address = UDPClientSupport.serverAddress();
-            UDPClientSupport.send(socket, address, PORT,
-                    ";" + UDPClientSupport.STUDENT_CODE + ";" + Q_CODE);
-            String[] parts = UDPClientSupport.receive(socket).split(";", 3);
-            Set<Character> removed = new HashSet<>();
-            for (char c : parts[2].toCharArray()) removed.add(c);
-            StringBuilder output = new StringBuilder();
-            for (char c : parts[1].toCharArray()) if (!removed.contains(c)) output.append(c);
-            UDPClientSupport.send(socket, address, PORT, parts[0] + ";" + output);
+        String host = "36.50.135.242";
+        int port = 808;
+
+        String studentCode = "B23DCCN952";
+        String qCode = "B34D51E0";
+
+        try {
+            DatagramSocket socket = new DatagramSocket();
+            socket.setSoTimeout(5000);
+
+            InetAddress serverAddress = InetAddress.getByName(host);
+
+            String message = ";" + studentCode + ";" + qCode;
+
+            byte[] sendData = message.getBytes(StandardCharsets.UTF_8);
+
+            DatagramPacket sendPacket = new DatagramPacket(
+                    sendData,
+                    sendData.length,
+                    serverAddress,
+                    port
+            );
+
+            socket.send(sendPacket);
+
+            byte[] buffer = new byte[4096];
+
+            DatagramPacket receivePacket = new DatagramPacket(
+                    buffer,
+                    buffer.length
+            );
+
+            socket.receive(receivePacket);
+
+            String response = new String(
+                    receivePacket.getData(),
+                    0,
+                    receivePacket.getLength(),
+                    StandardCharsets.UTF_8
+            );
+
+            System.out.println("Server: " + response);
+
+            String[] parts = response.split(";", 3);
+
+            String requestId = parts[0];
+            String str1 = parts[1];
+            String str2 = parts[2];
+
+            StringBuilder strOutput = new StringBuilder();
+
+            for (int i = 0; i < str1.length(); i++) {
+
+                char c = str1.charAt(i);
+
+                if (str2.indexOf(c) == -1) {
+                    strOutput.append(c);
+                }
+            }
+
+            String result = requestId + ";" + strOutput;
+
+            byte[] resultData =
+                    result.getBytes(StandardCharsets.UTF_8);
+
+            DatagramPacket resultPacket = new DatagramPacket(
+                    resultData,
+                    resultData.length,
+                    receivePacket.getAddress(),
+                    receivePacket.getPort()
+            );
+
+            socket.send(resultPacket);
+
+            System.out.println("str1: " + str1);
+            System.out.println("str2: " + str2);
+            System.out.println("Output: " + strOutput);
+            System.out.println("Ket qua: " + result);
+
+            socket.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

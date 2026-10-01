@@ -9,7 +9,7 @@ import java.net.DatagramSocket;
  * B23DCCN952.
  */
 public class UDPObject4 {
-    private static final int PORT = 809;
+    private static final int PORT = 2209;
     private static final String Q_CODE = "THAY_QCODE_CAU_4";
 
     public static void main(String[] args) throws Exception {

@@ -9,7 +9,7 @@ import java.net.DatagramSocket;
  Ex: requestId;1,4,7,8,9,10
  */
 public class UDPDataTypeQ4 {
-    private static final int PORT = 807;
+    private static final int PORT = 2207;
     private static final String Q_CODE = "gQ5PAl8r";
 
     public static void main(String[] args) throws Exception {

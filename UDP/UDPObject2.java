@@ -9,7 +9,7 @@ import java.net.DatagramSocket;
  * yyyy-mm-dd thành dd/mm/yyyy rồi gửi lại object. Mã SV: B23DCCN952.
  */
 public class UDPObject2 {
-    private static final int PORT = 809;
+    private static final int PORT = 2209;
     private static final String Q_CODE = "THAY_QCODE_CAU_2";
 
     public static void main(String[] args) throws Exception {

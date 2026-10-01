@@ -1,4 +1,8 @@
-import java.util.LinkedHashMap;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -7,25 +11,103 @@ import java.util.Map;
  * từ 1), gửi requestId;character:position1,position2,... . Mã SV: B23DCCN952.
  */
 public class UDPCharacterQ1 {
-    private static final int PORT = 808;
-    private static final String Q_CODE = "IuRWGyUR";
+    public static void main(String[] args) {
 
-    public static void main(String[] args) throws Exception {
-        System.out.println(UDPClientSupport.request(Q_CODE, PORT, UDPCharacterQ1::solve));
-    }
+        String host = "36.50.135.242";
+        int port = 808;
 
-    private static String solve(String data) {
-        if (data.isEmpty()) return ":";
-        Map<Character, Integer> count = new LinkedHashMap<>();
-        for (char c : data.toCharArray()) count.merge(c, 1, Integer::sum);
-        char best = data.charAt(0);
-        for (char c : data.toCharArray()) {
-            if (count.get(c) > count.get(best)) best = c;
+        String studentCode = "B23DCCN952";
+        String qCode = "EE29C059";
+
+        try {
+            DatagramSocket socket = new DatagramSocket();
+            socket.setSoTimeout(5000);
+
+            InetAddress serverAddress = InetAddress.getByName(host);
+
+            String message = ";" + studentCode + ";" + qCode;
+
+            byte[] sendData = message.getBytes(StandardCharsets.UTF_8);
+
+            DatagramPacket sendPacket = new DatagramPacket(
+                    sendData,
+                    sendData.length,
+                    serverAddress,
+                    port
+            );
+
+            socket.send(sendPacket);
+
+            byte[] buffer = new byte[4096];
+
+            DatagramPacket receivePacket = new DatagramPacket(
+                    buffer,
+                    buffer.length
+            );
+
+            socket.receive(receivePacket);
+
+            String response = new String(
+                    receivePacket.getData(),
+                    0,
+                    receivePacket.getLength(),
+                    StandardCharsets.UTF_8
+            );
+
+            System.out.println("Server: " + response);
+
+            String[] parts = response.split(";", 2);
+
+            String requestId = parts[0];
+            String data = parts[1];
+
+            Map<Character, Integer> count = new HashMap<>();
+
+            for (char c : data.toCharArray()) {
+                count.put(c, count.getOrDefault(c, 0) + 1);
+            }
+
+            char maxChar = data.charAt(0);
+            int maxCount = 0;
+
+            for (char c : data.toCharArray()) {
+                if (count.get(c) > maxCount) {
+                    maxCount = count.get(c);
+                    maxChar = c;
+                }
+            }
+
+            StringBuilder positions = new StringBuilder();
+
+            for (int i = 0; i < data.length(); i++) {
+                if (data.charAt(i) == maxChar) {
+                    positions.append(i).append(",");
+                }
+            }
+
+            String result =
+                    requestId + ";" + maxChar + ":" + positions;
+
+            byte[] resultData =
+                    result.getBytes(StandardCharsets.UTF_8);
+
+            DatagramPacket resultPacket = new DatagramPacket(
+                    resultData,
+                    resultData.length,
+                    receivePacket.getAddress(),
+                    receivePacket.getPort()
+            );
+
+            socket.send(resultPacket);
+
+            System.out.println("Ky tu xuat hien nhieu nhat: " + maxChar);
+            System.out.println("So lan xuat hien: " + maxCount);
+            System.out.println("Ket qua: " + result);
+
+            socket.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        StringBuilder positions = new StringBuilder();
-        for (int i = 0; i < data.length(); i++) {
-            if (data.charAt(i) == best) positions.append(i + 1).append(',');
-        }
-        return best + ":" + positions;
     }
 }

@@ -29,7 +29,7 @@ d. Đóng socket và kết thúc chương trình.
 public class UDPObject1 {
 
     private static final String SERVER_IP = "36.50.135.242";
-    // Theo đề bài: UDP Object chạy tại cổng 809.
+    // Theo mẫu server đang dùng: UDP Object chạy tại cổng 2209.
     private static final int SERVER_PORT = 2209;
 
     public static void main(String[] args) {
